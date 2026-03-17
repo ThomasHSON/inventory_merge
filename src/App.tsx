@@ -61,7 +61,7 @@ function App() {
       <Navbar user={user} onLogout={handleLogout} />
       <Tabs />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-10">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-10">
         <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0 mb-6">
           <div className="flex-1 max-w-md">
             <div className="relative">
