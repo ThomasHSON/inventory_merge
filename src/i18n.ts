@@ -22,6 +22,7 @@ const resources = {
         review: 'Review',
         report: 'Report',
         final: 'Final',
+        daily: 'daily inventory',
       },
       copyright: 'Copyright ©2025 鴻森智能科技',
       logout: 'Logout',
