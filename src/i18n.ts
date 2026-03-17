@@ -89,7 +89,8 @@ const resources = {
         merge: '合併',
         review: '覆盤',
         report: '報表',
-        final: '定盤'
+        final: '定盤',
+        daily: '每日盤點報表',
       },
       copyright: 'Copyright ©2025 鴻森智能科技',
       logout: '登出',
