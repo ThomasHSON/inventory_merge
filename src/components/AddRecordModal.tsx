@@ -169,29 +169,37 @@ const AddRecordModal: React.FC<AddRecordModalProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {searchResults.map((record) => (
-                      <tr key={record.GUID} className="border-t">
-                        <td className="px-3 py-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedRecords.has(record.GUID)}
-                            onChange={() => {
-                              const newSelection = new Set(selectedRecords);
-                              if (newSelection.has(record.GUID)) {
-                                newSelection.delete(record.GUID);
-                              } else {
-                                newSelection.add(record.GUID);
-                              }
-                              setSelectedRecords(newSelection);
-                            }}
-                            className="rounded border-gray-300"
-                          />
-                        </td>
-                        <td className="p-4">{record.SN}</td>
-                        <td className="p-4">{record.NAME}</td>
-                        <td className="p-4">{record.TYPE}</td>
-                      </tr>
-                    ))}
+                    {searchResults.map((record) => {
+                      const isSelected = selectedRecords.has(record.GUID);
+                      const toggleRecord = () => {
+                        const newSelection = new Set(selectedRecords);
+                        if (newSelection.has(record.GUID)) {
+                          newSelection.delete(record.GUID);
+                        } else {
+                          newSelection.add(record.GUID);
+                        }
+                        setSelectedRecords(newSelection);
+                      };
+                      return (
+                        <tr
+                          key={record.GUID}
+                          className={`border-t cursor-pointer select-none transition-colors ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                          onClick={toggleRecord}
+                        >
+                          <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={toggleRecord}
+                              className="rounded border-gray-300"
+                            />
+                          </td>
+                          <td className="p-4">{record.SN}</td>
+                          <td className="p-4">{record.NAME}</td>
+                          <td className="p-4">{record.TYPE}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
