@@ -20,59 +20,42 @@ const AddRecordModal: React.FC<AddRecordModalProps> = ({
   const { t } = useTranslation();
   const [searchField, setSearchField] = useState<'NAME' | 'SN'>('NAME');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Record[]>([]);
+  const [allRecords, setAllRecords] = useState<Record[]>([]);
   const [selectedRecords, setSelectedRecords] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
     setSearchField('NAME');
     setSearchQuery('');
-    setSearchResults([]);
+    setAllRecords([]);
     setSelectedRecords(new Set());
   };
 
   useEffect(() => {
     if (isOpen) {
       resetForm();
+      const fetchRecords = async () => {
+        try {
+          setLoading(true);
+          const records = await ApiService.getAllRecords();
+          const existingSNs = new Set(sheet.records_Ary.map(r => r.SN));
+          setAllRecords(records.filter(record => !existingSNs.has(record.SN)));
+        } catch (error) {
+          console.error('Failed to fetch records:', error);
+          setAllRecords([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchRecords();
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const fetchAndFilterRecords = async () => {
-      if (!searchQuery.trim()) {
-        setSearchResults([]);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const records = await ApiService.getAllRecords();
-        
-        // Create a Set of existing record SNs for O(1) lookup
-        const existingSNs = new Set(sheet.records_Ary.map(r => r.SN));
-        
-        // Filter records
-        const filteredRecords = records.filter(record => {
-          // Exclude records already in the sheet
-          if (existingSNs.has(record.SN)) return false;
-          
-          // Apply search filter
-          const searchValue = searchField === 'NAME' ? record.NAME : record.SN;
-          return searchValue.toLowerCase().includes(searchQuery.toLowerCase());
-        });
-
-        setSearchResults(filteredRecords);
-      } catch (error) {
-        console.error('Failed to fetch records:', error);
-        setSearchResults([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const debounceTimer = setTimeout(fetchAndFilterRecords, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchQuery, searchField, sheet.records_Ary]);
+  const searchResults = allRecords.filter(record => {
+    if (!searchQuery.trim()) return true;
+    const searchValue = searchField === 'NAME' ? record.NAME : record.SN;
+    return searchValue.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   const toggleAllRecords = () => {
     if (selectedRecords.size === searchResults.length) {
@@ -166,7 +149,7 @@ const AddRecordModal: React.FC<AddRecordModalProps> = ({
                 <div className="text-center py-8">{t('loading')}</div>
               ) : searchResults.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  {searchQuery ? t('noRecordsFound') : t('searchPrompt')}
+                  {t('noRecordsFound')}
                 </div>
               ) : (
                 <table className="w-full">
