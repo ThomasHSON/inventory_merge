@@ -126,6 +126,15 @@ export class ApiService {
     document.body.removeChild(a);
   }
 
+  static async getDailyReportEnabled(): Promise<boolean> {
+    const response = await this.fetchApi(API_ENDPOINTS.GET_SETTING_BY_PAGE, 'POST', {
+      ValueAry: ['inventory']
+    });
+    const settings: Array<{ name: string; value: string }> = response.Data || [];
+    const setting = settings.find(s => s.name === 'daily_report');
+    return setting?.value?.toLowerCase() === 'true';
+  }
+
   static async exportRecord(sn: string, type: string): Promise<void> {
     const baseUrl = await this.getBaseUrl();
     console.log({
